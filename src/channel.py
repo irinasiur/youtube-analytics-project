@@ -11,23 +11,20 @@ class Channel:
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.__channel_id = channel_id
-        self.id = self.get_all()["id"]
-        self.title = self.get_all()["title"]
-        self.description = self.get_all()["description"]
-        self.url = self.get_all()["url"]
-        self.subscriber_count = self.get_all()["subscriberCount"]
-        self.video_count = self.get_all()["videoCount"]
-        self.view_count = self.get_all()["viewCount"]
+        self.id = self.get_all("", "id")["id"]
+        self.title = self.get_all("snippet", "title")["title"]
+        self.description = self.get_all("snippet", "description")["description"]
+        self.url = "https://www.youtube.com/channel/" + self.__channel_id
+        self.subscriber_count = self.get_all("statistics", "subscriberCount")["subscriberCount"]
+        self.video_count = self.get_all("statistics", "videoCount")["videoCount"]
+        self.view_count = self.get_all("statistics", "viewCount")["viewCount"]
 
     info = {}
     api_key: str = os.getenv('YT_API_KEY')
+
     @property
     def channel_id(self):
         return self.__channel_id
-
-    # @channel_id.setter
-    # def channel_id(self, new_ch):
-    #     self.__channel_id = new_ch
 
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
@@ -35,20 +32,28 @@ class Channel:
         dict_to_print = youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
         json.dumps(dict_to_print, indent=2, ensure_ascii=False)
 
-    def get_all(self):
+
+
+    def get_all(self, word1, word2):
         """Заполняет словарь self.info значениячми для полей класса Channel."""
-        #api_key: str = os.getenv('YT_API_KEY')
+        # api_key: str = os.getenv('YT_API_KEY')
         youtube = build('youtube', 'v3', developerKey=self.api_key)
         dict_to_print = youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
-        self.info["id"] = dict_to_print["items"][0]["id"]
-        self.info["title"] = dict_to_print["items"][0]["snippet"]["title"]
-        self.info["url"] = "https://www.youtube.com/channel/" + self.__channel_id
-        self.info["description"] = dict_to_print["items"][0]["snippet"]["description"]
-        self.info["subscriberCount"] = dict_to_print["items"][0]["statistics"]["subscriberCount"]
-        self.info["videoCount"] = dict_to_print["items"][0]["statistics"]["videoCount"]
-        self.info["viewCount"] = dict_to_print["items"][0]["statistics"]["viewCount"]
+        if word1 == "":
+            self.info[word2] = dict_to_print["items"][0][word2]
+        else:
+            self.info[word2] = dict_to_print["items"][0][word1][word2]
         return self.info
-    @staticmethod
-    def get_service():
+
+    @classmethod
+    def get_service(cls):
         api_key: str = os.getenv('YT_API_KEY')
         return build('youtube', 'v3', developerKey=api_key)
+
+    def to_json(self, filename):
+        with open(filename, "w") as write_file:
+            my_string = json.dumps(self.info, ensure_ascii=False).encode('utf-8').decode()
+            json.dump(my_string, write_file, ensure_ascii=False)
+
+
+
