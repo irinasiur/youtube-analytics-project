@@ -32,8 +32,6 @@ class Channel:
         dict_to_print = youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
         json.dumps(dict_to_print, indent=2, ensure_ascii=False)
 
-
-
     def get_all(self, word1, word2):
         """Заполняет словарь self.info значениячми для полей класса Channel."""
         # api_key: str = os.getenv('YT_API_KEY')
@@ -55,5 +53,64 @@ class Channel:
             my_string = json.dumps(self.info, ensure_ascii=False).encode('utf-8').decode()
             json.dump(my_string, write_file, ensure_ascii=False)
 
+    def __str__(self):
+        """
+        Возвращает название и ссылку на канал.
+        """
+        return f'{self.title} ({self.url})'
 
+    def __add__(self, other):
+        """
+        Складывет количество подписчиков двух каналов между собой.
+        """
+        if not isinstance(other, Channel):
+            return NotImplemented
+        return int(self.subscriber_count) + int(other.subscriber_count)
 
+    def __sub__(self, other):
+        """
+        Вычитает количество подписчиков каналов.
+        """
+        if not isinstance(other, Channel):
+            return NotImplemented
+        return int(self.subscriber_count) - int(other.subscriber_count)
+
+    def __gt__(self, other):
+        """
+        Сравнивает количество подписчиков канала self и канала other (больше).
+        """
+        if not isinstance(other, Channel):
+            return NotImplemented
+        return int(self.subscriber_count) > int(other.subscriber_count)
+
+    def __ge__(self, other):
+        """
+        Сравнивает количество подписчиков канала self и канала other (больше или равно).
+        """
+        if not isinstance(other, Channel):
+            return NotImplemented
+        return int(self.subscriber_count) >= int(other.subscriber_count)
+
+    def __lt__(self, other):
+        """
+        Сравнивает количество подписчиков канала self и канала other (меньше).
+        """
+        if not isinstance(other, Channel):
+            return NotImplemented
+        return int(self.subscriber_count) < int(other.subscriber_count)
+
+    def __le__(self, other):
+        """
+        Сравнивает количество подписчиков канала self и канала other (меньше или равно).
+        """
+        if not isinstance(other, Channel):
+            return NotImplemented
+        return int(self.subscriber_count) <= int(other.subscriber_count)
+
+    def __eq__(self, other):
+        """
+        Сравнивает количество подписчиков канала self и канала other.
+        """
+        if not isinstance(other, Channel):
+            return NotImplemented
+        return int(self.subscriber_count) == int(other.subscriber_count)
