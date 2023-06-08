@@ -26,19 +26,8 @@ class Video:
 
 
 class PLVideo(Video):
-    api_key: str = os.getenv('YT_API_KEY')
 
     def __init__(self, video_id: str, playlist_id: str):
         super().__init__(video_id)
         self.playlist_id = playlist_id
-        self.youtube = build('youtube', 'v3', developerKey=self.api_key)
-
-        video_response = self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
-                                                    id=video_id
-                                                    ).execute()
-
-        self.video_title: str = video_response['items'][0]['snippet']['title']
-        self.view_count: int = video_response['items'][0]['statistics']['viewCount']
-        self.like_count: int = video_response['items'][0]['statistics']['likeCount']
-        self.url = "https://www.youtube.com/watch?v=" + self.video_id
 
