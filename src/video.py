@@ -12,11 +12,21 @@ class Video:
         video_response = youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
                                                id=self.video_id
                                                ).execute()
-        # printj(video_response)
-        self.video_title: str = video_response['items'][0]['snippet']['title']
-        self.view_count: int = video_response['items'][0]['statistics']['viewCount']
-        self.like_count: int = video_response['items'][0]['statistics']['likeCount']
-        self.url = "https://www.youtube.com/watch?v=" + self.video_id
+        try:
+            self.title: str = video_response['items'][0]['snippet']['title']
+        except IndexError:
+            self.title = None
+        try:
+            self.view_count: int = video_response['items'][0]['statistics']['viewCount']
+        except IndexError:
+            self.view_count = None
+        try:
+            self.like_count: int = video_response['items'][0]['statistics']['likeCount']
+        except IndexError:
+            self.like_count = None
+            self.url = None
+        else:
+            self.url = "https://www.youtube.com/watch?v=" + self.video_id
 
     def __str__(self):
         """
